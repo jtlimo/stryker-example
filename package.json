@@ -1,0 +1,16 @@
+{
+  "name": "stryker-example",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Stryker example",
+  "license": "",
+  "main": "",
+  "engines": {
+    "node": "10.14.1",
+    "npm": "6.4.1"
+  },
+  "scripts": {
+    "test": "NODE_ENV=${NODE_ENV:=test} mocha 'components/**/*.test.{ts,js}' 'interfaces/http/private-api/test/**/*.test.{ts,js}' 'interfaces/consumers/**/*.test.{ts,js}' 'test/**/*.test.{ts,js}' 'services/**/*.test.{ts,js}'"
+  },
+  "dependencies": {}
+}

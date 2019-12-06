@@ -1,0 +1,6 @@
+--timeout=50000
+--reporter=progress
+--require ts-node/register
+--require ./test/MochaBootstrap.js
+--require ./test/mocha.env.js
+--exit
