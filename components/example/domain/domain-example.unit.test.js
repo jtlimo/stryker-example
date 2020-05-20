@@ -1,4 +1,4 @@
-const Calculator = require('../domain-example');
+const Calculator = require('./domain-example');
 
 describe('Calculator', () => {
   describe('#sum', () => {
