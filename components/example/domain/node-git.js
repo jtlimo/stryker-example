@@ -1,29 +1,57 @@
-const nodeGit = require('nodegit');
-const path = require("path");
+const { TREE } = require('isomorphic-git');
+const git = require('isomorphic-git');
+const path = require('path');
+const fs = require('fs');
 
-(async function getHistory() {
-    const repo = await nodeGit.Repository.open(path.resolve(__dirname, "../../../.git"));
-    const commit = await repo.getCommit("c2dc2184dcf5d234dd48bfecae7107ba546c1c30");
-    debugger;
-    console.log("commit:", commit.sha());
-    console.log("Author:", commit.author().name());
-    console.log("Date:", commit.date());
-    console.log("\n    ", commit.message());
-
-    const difference = await commit.getDiff(async function(diffList) {
-        for (const diff of diffList) {
-            const patches = await diff.patches();
-            for (const patch of patches) {
-                const hunks = await patch.hunks();
-                for (const hunk of hunks) {
-                    const lines = await hunks.lines();
-                    for (const line of lines) console.log(String.fromCharCode(line.origin()) +
-                        line.content().trim());
-                }
+async function getFilesChanges() {
+    const dir = path.resolve(`${__dirname}`, '../../../');
+    await git.walk({
+        fs,
+        dir,
+        trees: [
+            TREE({ ref: 'HEAD' }),
+            TREE({ ref: 'origin/master' }),
+        ],
+        map: async function(filepath, [A, B]) {
+            // ignore directories
+            if (filepath === '.') {
+                return
             }
-        }
+            if ((await A.type()) === 'tree' || (await B.type()) === 'tree') {
+                return
+            }
+
+            // generate ids
+            const Aoid = await A.oid()
+            const Boid = await B.oid()
+
+            // determine modification type
+            let type = 'equal'
+            if (Aoid !== Boid) {
+                type = 'modify'
+            }
+            if (Aoid === undefined) {
+                type = 'add'
+            }
+            if (Boid === undefined) {
+                type = 'remove'
+            }
+            if (Aoid === undefined && Boid === undefined) {
+                console.log('Something weird happened:')
+                console.log(A)
+                console.log(B)
+            }
+
+            return {
+                path: `/${filepath}`,
+                type: type,
+            }
+        },
     });
-    console.log('difference', difference);
-    // return repo.getCommit("c2dc2184dcf5d234dd48bfecae7107ba546c1c30");
+}
+
+(async function() {
+   const files = await getFilesChanges();
+   console.log(files);
 })();
 
