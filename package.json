@@ -13,7 +13,7 @@
     "test": "NODE_ENV=${NODE_ENV:=test} mocha './components/**/**/*.unit.test.{ts,js}'"
   },
   "dependencies": {
-    "isomorphic-git": "^1.4.0"
+    "isomorphic-git": "^1.8.2"
   },
   "devDependencies": {
     "@stryker-mutator/core": "^2.5.0",
